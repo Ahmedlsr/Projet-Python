@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#Programme a pour but d'analyser les tendances et donc de donner des signaux d'achat et de vente de l'action Apple notamment grace à un graphique
 import matplotlib.pyplot as plt
 import yfinance as yf
 apple = yf.download('AAPL', start='2020-01-01', end='2024-01-01')
@@ -21,13 +22,14 @@ for i in range(12,len(apple)):
 
 for i in range(26,len(apple)):
     apple.loc[i:, "EMA26"] = (apple["Adj Close"][i] - apple["EMA26"][i-1])*(2/27) + apple["EMA12"][i-1]
-    
+#Moyennes mobiles exponentielles donnent plus de poids aux données récentes 12 et 26 periode pour court et moyen terme    
 apple["MACD"] = apple["EMA12"]-apple["EMA26"]
+#Indicateur de momentum aide a identifier la force durée etc d'une tendance
 for i in range (0,10):
     SMA9 += apple["MACD"][i]
 SMA9 = SMA9/9
 apple.loc[:9, "Signal"] = SMA9
-
+#Identifier le changement de momentum 
 for i in range(9,len(apple)):
     apple.loc[i:, "Signal"] = (apple["MACD"][i] - apple["Signal"][i-1])*(2/10) + apple["Signal"][i-1]
 
@@ -70,4 +72,3 @@ ax2.legend(loc='upper right')
 
 plt.title('Adj Close, EMA, MACD, Signal avec Signaux d\'achat et vente')
 plt.show()
-
